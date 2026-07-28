@@ -26,7 +26,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm text-zinc-400">
             <li>
               <Link
-                href="/products"
+                href="/allProducts"
                 className="transition-colors hover:text-white"
               >
                 Products

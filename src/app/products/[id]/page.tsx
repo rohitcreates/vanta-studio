@@ -1,7 +1,6 @@
 import { products } from "@/data/products";
 import ProductGallery from "@/components/product/productGallery";
-import ProductInfo from "@/components/product/productInfo";
-import ProductActions from "@/components/product/productActions";
+import ProductDetails from "@/components/product/productDetails";
 import ProductDescription from "@/components/product/productDescription";
 
 type ProductPageProps = {
@@ -28,10 +27,7 @@ export default async function ProductPage({
       <div className="grid gap-10 lg:grid-cols-2">
         <ProductGallery product={product} />
 
-        <div className="space-y-8">
-          <ProductInfo product={product} />
-          <ProductActions product={product} />
-        </div>
+        <ProductDetails product={product} />
       </div>
 
       <div className="mt-16">

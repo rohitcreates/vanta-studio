@@ -1,23 +1,35 @@
+"use client";
+
 import type { Product } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
 
 type Props = {
   product: Product;
 };
 
 export default function ProductCard({ product }: Props) {
+  const { toggleWishlist, isWishlisted } = useWishlist();
+
   return (
-    <div className="group w-80 flex-shrink 0">
-      
+    <div className="group w-80 flex-shrink-0">
       <div className="relative overflow-hidden rounded-xl bg-zinc-100">
-     
         <button
+          onClick={() => toggleWishlist(product.id)}
           className="absolute right-3 top-3 z-10 rounded-full bg-white/80 p-2 transition-colors hover:bg-white"
           aria-label="Add to wishlist"
         >
-          <Heart size={18} className="text-zinc-700" />
+          <Heart
+            size={18}
+            fill={isWishlisted(product.id) ? "currentColor" : "none"}
+            className={
+              isWishlisted(product.id)
+                ? "text-red-500"
+                : "text-zinc-700"
+            }
+          />
         </button>
 
         <Link href={`/products/${product.id}`}>
@@ -31,7 +43,6 @@ export default function ProductCard({ product }: Props) {
         </Link>
       </div>
 
-  
       <div className="mt-3 space-y-1">
         <Link href={`/products/${product.id}`}>
           <h2 className="line-clamp-1 font-medium text-white transition-colors hover:text-zinc-300">

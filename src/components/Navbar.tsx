@@ -4,10 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SearchBar from "@/components/SearchBar";
 import { Heart, ShoppingBag, User } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
   const router = useRouter();
+  const { wishlist } = useWishlist();
+  const { cart } = useCart();
 
   const handleSearch = () => {
     const trimmedQuery = query.trim();
@@ -29,7 +33,7 @@ export default function Navbar() {
           VANTA
         </Link>
 
-        {/* Search */}
+        
         <div className="flex-1">
           <SearchBar
             value={query}
@@ -38,19 +42,40 @@ export default function Navbar() {
           />
         </div>
 
-        {/* Actions */}
+      
       <div className="flex items-center gap-5 text-white">
-          <button className="rounded-full p-2 text-gray-400 transition-all hover:scale-105 hover:bg-zinc-800 hover:text-white">
+          <Link
+            href="/wishlist"
+            className="relative rounded-full p-2 text-gray-400 transition-all hover:scale-105 hover:bg-zinc-800 hover:text-white"
+          >
             <Heart />
-          </button>
 
-          <button className="rounded-full p-2 text-gray-400 transition-all hover:scale-105 hover:bg-zinc-800 hover:text-white">
+            {wishlist.length > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-semibold text-white">
+                {wishlist.length}
+              </span>
+            )}
+          </Link>
+
+          <Link
+            href="/cart"
+            className="relative rounded-full p-2 text-gray-400 transition-all hover:scale-105 hover:bg-zinc-800 hover:text-white"
+          >
             <ShoppingBag />
-          </button>
 
-          <button className="rounded-full p-2 text-gray-400 transition-all hover:scale-105 hover:bg-zinc-800 hover:text-white"  >
+            {cart.length > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-semibold text-black">
+                {cart.length}
+              </span>
+            )}
+          </Link>
+
+          <Link
+            href="/profile"
+            className="rounded-full p-2 text-gray-400 transition-all hover:scale-105 hover:bg-zinc-800 hover:text-white"
+          >
             <User />
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
