@@ -1,5 +1,5 @@
 import ProductGrid from "@/components/ProductGrid";
-import { products } from "@/data/products";
+import type { Product } from "@/types/product";
 
 type CategoryPageProps = {
   params: Promise<{
@@ -12,13 +12,17 @@ export default async function CategoryPage({
 }: CategoryPageProps) {
   const { category } = await params;
 
+  const response = await fetch("http://localhost:3000/api/products");
+
+  const products: Product[] = await response.json();
+
   const filteredProducts = products.filter(
     (product) => product.category === category
   );
 
   return (
     <main>
-      <h1 className="text-3xl font-bold mb-8 capitalize">
+      <h1 className="mb-8 text-3xl font-bold capitalize">
         {category}
       </h1>
 

@@ -1,5 +1,5 @@
 import ProductGrid from "@/components/ProductGrid";
-import { products } from "@/data/products";
+import type { Product } from "@/types/product";
 
 type SearchPageProps = {
   searchParams: Promise<{
@@ -11,6 +11,10 @@ export default async function SearchPage({
   searchParams,
 }: SearchPageProps) {
   const { q = "" } = await searchParams;
+
+  const response = await fetch("http://localhost:3000/api/products");
+
+  const products: Product[] = await response.json();
 
   const search = q.toLowerCase();
 

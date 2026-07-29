@@ -1,4 +1,4 @@
-import { products } from "@/data/products";
+import type { Product } from "@/types/product";
 import ProductGallery from "@/components/product/productGallery";
 import ProductDetails from "@/components/product/productDetails";
 import ProductDescription from "@/components/product/productDescription";
@@ -14,6 +14,10 @@ export default async function ProductPage({
 }: ProductPageProps) {
   const { id } = await params;
 
+  const response = await fetch("http://localhost:3000/api/products");
+
+  const products: Product[] = await response.json();
+
   const product = products.find(
     (product) => product.id === Number(id)
   );
@@ -26,7 +30,6 @@ export default async function ProductPage({
     <main className="container mx-auto px-4 py-10">
       <div className="grid gap-10 lg:grid-cols-2">
         <ProductGallery product={product} />
-
         <ProductDetails product={product} />
       </div>
 
