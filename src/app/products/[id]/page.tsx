@@ -14,13 +14,11 @@ export default async function ProductPage({
 }: ProductPageProps) {
   const { id } = await params;
 
-  const response = await fetch("http://localhost:3000/api/products");
-
-  const products: Product[] = await response.json();
-
-  const product = products.find(
-    (product) => product.id === Number(id)
+  const response = await fetch(
+    `http://localhost:3000/api/products/${id}`
   );
+
+  const product = await response.json();
 
   if (!product) {
     return <h1>Product not found.</h1>;

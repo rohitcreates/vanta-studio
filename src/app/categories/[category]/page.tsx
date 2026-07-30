@@ -12,13 +12,12 @@ export default async function CategoryPage({
 }: CategoryPageProps) {
   const { category } = await params;
 
-  const response = await fetch("http://localhost:3000/api/products");
+  const response = await fetch(`http://localhost:3000/api/products?category=${category}`);
 
   const products: Product[] = await response.json();
 
-  const filteredProducts = products.filter(
-    (product) => product.category === category
-  );
+  
+  
 
   return (
     <main>
@@ -26,7 +25,7 @@ export default async function CategoryPage({
         {category}
       </h1>
 
-      <ProductGrid products={filteredProducts} />
+      <ProductGrid products={products} />
     </main>
   );
 }
