@@ -10,26 +10,53 @@ export default function SignupForm() {
   const { signup } = useAuth();
 
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const [error, setError] = useState("");
+
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault();
 
-    if (!name || !email || !password || !confirmPassword) {
-      alert("Please fill in all fields.");
+    setError("");
+
+    if (
+      !name ||
+      !username ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
+      setError("Please fill in all fields.");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
-    signup();
+    try {
+      await signup(
+        name,
+        username,
+        email,
+        password
+      );
 
-    router.push("/");
+      router.push("/login");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Something went wrong.");
+      }
+    }
   }
 
   return (
@@ -55,8 +82,26 @@ export default function SignupForm() {
             type="text"
             placeholder="Enter your full name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none transition focus:border-white"
+            onChange={(e) =>
+              setName(e.target.value)
+            }
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-white"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-zinc-300">
+            Username
+          </label>
+
+          <input
+            type="text"
+            placeholder="Choose a username"
+            value={username}
+            onChange={(e) =>
+              setUsername(e.target.value)
+            }
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-white"
           />
         </div>
 
@@ -69,8 +114,10 @@ export default function SignupForm() {
             type="email"
             placeholder="Enter your email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none transition focus:border-white"
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-white"
           />
         </div>
 
@@ -83,8 +130,10 @@ export default function SignupForm() {
             type="password"
             placeholder="Create a password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none transition focus:border-white"
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-white"
           />
         </div>
 
@@ -97,10 +146,20 @@ export default function SignupForm() {
             type="password"
             placeholder="Confirm your password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none transition focus:border-white"
+            onChange={(e) =>
+              setConfirmPassword(
+                e.target.value
+              )
+            }
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none focus:border-white"
           />
         </div>
+
+        {error && (
+          <p className="text-sm text-red-500">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"

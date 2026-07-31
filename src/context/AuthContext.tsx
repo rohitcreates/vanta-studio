@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   createContext,
@@ -8,16 +8,27 @@ import {
   useEffect,
 } from "react";
 
-import type {User} from "@/types/user"
+import type { User } from "@/types/user";
 
-type AuthContextType={
-    user: User| null;
-    isAuthenticated :boolean;
-    login:()=> void;
-    signup:()=> void;
-    logout:()=> void;
+type AuthContextType = {
+  user: User | null;
+  isAuthenticated: boolean;
+  loading: boolean;
 
-}
+  login: (
+    email: string,
+    password: string
+  ) => Promise<void>;
+
+  signup: (
+    name: string,
+    username: string,
+    email: string,
+    password: string
+  ) => Promise<void>;
+
+  logout: () => void;
+};
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -28,63 +39,102 @@ type AuthProviderProps = {
 export function AuthProvider({
   children,
 }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    const [user, setUser] = useState<User | null>(null);
-    const isAuthenticated = user !== null;
+  const isAuthenticated = user !== null;
 
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
 
-
-function login() {
-  
-  const user = {
-  id: "1",
-  name: "Rohit",
-  email: "rohit@gmail.com",
-};
-
-setUser(user);
-localStorage.setItem("user", JSON.stringify(user));
-}
-
-function logout() {
-  setUser(null);
-  localStorage.removeItem("user");
-}
-
-useEffect(() => {
-  const savedUser = localStorage.getItem("user");
-
-  if (savedUser) {
-    try {
-      const parsedUser: User = JSON.parse(savedUser);
-      setUser(parsedUser);
-    } catch {
-      localStorage.removeItem("user");
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch {
+        localStorage.removeItem("user");
+      }
     }
+
+    setLoading(false);
+  }, []);
+
+  async function login(
+    email: string,
+    password: string
+  ) {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    setUser(data.user);
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    );
   }
-}, []);
 
-function signup() {
-  setUser({
-    id: "1",
-    name: "New User",
-    email: "newuser@gmail.com",
-  });
-}
+  async function signup(
+    name: string,
+    username: string,
+    email: string,
+    password: string
+  ) {
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        username,
+        email,
+        password,
+      }),
+    });
 
-return (
-  <AuthContext.Provider
-    value={{
-      user,
-      isAuthenticated,
-      login,
-      signup,
-      logout,
-    }}
-  >
-    {children}
-  </AuthContext.Provider>
-);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    // Signup successful.
+    // Redirect to login page from SignupForm.
+  }
+
+  function logout() {
+    setUser(null);
+    localStorage.removeItem("user");
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        loading,
+        login,
+        signup,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

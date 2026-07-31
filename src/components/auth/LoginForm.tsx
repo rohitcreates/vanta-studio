@@ -8,21 +8,35 @@ import { useAuth } from "@/context/AuthContext";
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
   const router = useRouter();
   const { login } = useAuth();
 
- function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault();
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
+    e.preventDefault();
 
-  if (!email || !password) {
-    alert("Please fill in all fields.");
-    return;
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      await login(email, password);
+
+      router.push("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Something went wrong.");
+      }
+    }
   }
-
-  login();
-
-  router.push("/");
-}
 
   return (
     <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-8 shadow-2xl">
@@ -65,6 +79,12 @@ export default function LoginForm() {
             className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-white outline-none transition focus:border-white"
           />
         </div>
+
+        {error && (
+          <p className="text-sm text-red-500">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"
