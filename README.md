@@ -1,36 +1,275 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛍️ Vanta Studio
 
-## Getting Started
+A modern full-stack e-commerce application built with **Next.js**, **TypeScript**, **Prisma**, and **SQLite**.
 
-First, run the development server:
+Vanta Studio demonstrates a complete online shopping experience with authentication, product management, cart, checkout, order history, and an admin dashboard.
+
+---
+
+## 🚀 Live Demo
+
+> Add your deployed link here
+
+**Live:** https://your-app.vercel.app
+
+---
+
+## 📸 Screenshots
+
+> Add screenshots here after deployment.
+
+### Home Page
+
+![Home](./screenshots/home.png)
+
+### Product Page
+
+![Product](./screenshots/product.png)
+
+### Cart
+
+![Cart](./screenshots/cart.png)
+
+### Admin Dashboard
+
+![Admin](./screenshots/admin.png)
+
+---
+
+# ✨ Features
+
+## Customer
+
+- User Registration
+- User Login & Logout
+- Protected Profile Page
+- Browse Products
+- Product Details
+- Product Search
+- Wishlist
+- Shopping Cart
+- Checkout
+- Order History
+
+---
+
+## Admin
+
+- Admin Authentication
+- Protected Admin Dashboard
+- View Products
+- Add Products
+- Edit Products
+- Delete Products
+
+---
+
+## Backend
+
+- REST API
+- Prisma ORM
+- SQLite Database
+- Password Hashing (bcrypt)
+- Zod Validation
+- Role-Based Authorization
+
+---
+
+# 🛠 Tech Stack
+
+## Frontend
+
+- Next.js (App Router)
+- React
+- TypeScript
+- Tailwind CSS
+
+---
+
+## Backend
+
+- Next.js API Routes
+- Prisma ORM
+- SQLite
+- Zod
+- bcrypt
+
+---
+
+## Tools
+
+- Git
+- GitHub
+- Prisma Studio
+- Thunder Client
+
+---
+
+# 📂 Project Structure
+
+```text
+src/
+│
+├── app/
+│   ├── api/
+│   ├── admin/
+│   ├── cart/
+│   ├── checkout/
+│   ├── login/
+│   ├── signup/
+│   ├── profile/
+│   └── products/
+│
+├── components/
+│
+├── context/
+│
+├── lib/
+│
+├── providers/
+│
+├── types/
+│
+└── data/
+
+prisma/
+public/
+```
+
+---
+
+# 🗄 Database
+
+## Main Models
+
+- User
+- Product
+- Order
+- OrderItem
+
+---
+
+# Authentication
+
+- User Registration
+- Password Hashing
+- Login
+- Role-Based Authorization
+- Protected Routes
+
+---
+
+# API Endpoints
+
+## Authentication
+
+```
+POST /api/auth/register
+POST /api/auth/login
+```
+
+## Products
+
+```
+GET    /api/products
+GET    /api/products/:id
+POST   /api/products
+PATCH  /api/products/:id
+DELETE /api/products/:id
+```
+
+## Orders
+
+```
+GET  /api/orders
+POST /api/orders
+```
+
+---
+
+# Installation
+
+Clone the repository
+
+```bash
+git clone https://github.com/rohitcreates/vanta-studio.git
+```
+
+Go into the project
+
+```bash
+cd vanta-studio
+```
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Create the database
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+Start the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env` file.
 
-## Learn More
+```env
+DATABASE_URL="file:./dev.db"
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# What I Learned
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project helped me gain practical experience with:
 
-## Deploy on Vercel
+- Building a full-stack application using Next.js
+- Designing REST APIs
+- Database modeling with Prisma
+- Authentication and authorization
+- CRUD operations
+- State management using React Context
+- Form validation with Zod
+- TypeScript in production-scale applications
+- Building protected admin features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Future Improvements
+
+- PostgreSQL
+- JWT Authentication
+- Image Uploads (Cloudinary)
+- Payment Gateway Integration
+- Email Verification
+- Password Reset
+- Order Management Dashboard
+- User Management Dashboard
+- Analytics Dashboard
+
+---
+
+# Author
+
+**Rohit Singh**
+
+GitHub: https://github.com/rohitcreates
+
+---
+
+# License
+
+This project is for educational and portfolio purposes.
