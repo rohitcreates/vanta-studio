@@ -40,7 +40,7 @@ export default function ProfilePage() {
 
     loadOrders();
   }, [user]);
-
+console.log(user);
   return (
     <ProtectedRoute>
       <main className="mx-auto max-w-5xl px-6 py-10">

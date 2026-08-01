@@ -9,10 +9,16 @@ export async function GET(request: Request) {
   const category = searchParams.get("category");
 
   const products = await prisma.product.findMany({
-    where: category ? { category } : undefined,
-  });
+  where: category ? { category } : undefined,
+});
 
-  return NextResponse.json(products);
+const formattedProducts = products.map((product) => ({
+  ...product,
+  sizes: product.sizes.split(","),
+  colors: product.colors.split(","),
+}));
+
+return NextResponse.json(formattedProducts);
 }
 
 export async function POST(request: Request) {

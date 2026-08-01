@@ -20,7 +20,6 @@ export default function Navbar() {
   const {
     user,
     isAuthenticated,
-    login,
     logout,
   } = useAuth();
 
@@ -29,7 +28,9 @@ export default function Navbar() {
 
     if (trimmedQuery.length === 0) return;
 
-    router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+    router.push(
+      `/search?q=${encodeURIComponent(trimmedQuery)}`
+    );
   };
 
   return (
@@ -85,9 +86,18 @@ export default function Navbar() {
           {/* Authentication */}
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
+              {user?.role === "ADMIN" && (
+                <Link
+                  href="/admin"
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+                >
+                  Admin
+                </Link>
+              )}
+
               <Link
                 href="/profile"
-                className="text-sm font-medium text-white hover:text-gray-300"
+                className="text-sm font-medium text-white transition hover:text-gray-300"
               >
                 {user?.name}
               </Link>
