@@ -19,6 +19,8 @@ export default function CheckoutPage() {
 
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
+
   const [shippingInfo, setShippingInfo] = useState({
     firstName: "",
     lastName: "",
@@ -34,7 +36,7 @@ export default function CheckoutPage() {
 
   const [paymentMethod, setPaymentMethod] = useState("cod");
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (
       !shippingInfo.firstName ||
       !shippingInfo.lastName ||
@@ -49,20 +51,69 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (saveAddress) {
-      localStorage.setItem(
-        "shippingAddress",
-        JSON.stringify(shippingInfo)
-      );
+    const savedUser = localStorage.getItem("user");
+
+    if (!savedUser) {
+      alert("Please login first.");
+      router.push("/login");
+      return;
     }
 
-    if (checkoutSource === "cart") {
-      clearCart();
+    const user = JSON.parse(savedUser);
+
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+
+          paymentMethod,
+
+          ...shippingInfo,
+
+          items: checkoutItems.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      if (saveAddress) {
+        localStorage.setItem(
+          "shippingAddress",
+          JSON.stringify(shippingInfo)
+        );
+      }
+
+      if (checkoutSource === "cart") {
+        clearCart();
+      }
+
+      clearCheckout();
+
+      router.push("/order-success");
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Something went wrong.");
+      }
+    } finally {
+      setLoading(false);
     }
-
-    clearCheckout();
-
-    router.push("/order-success");
   };
 
   return (
@@ -89,6 +140,7 @@ export default function CheckoutPage() {
         <CheckoutSummary
           checkoutItems={checkoutItems}
           onPlaceOrder={handlePlaceOrder}
+          loading={loading}
         />
       </div>
     </main>

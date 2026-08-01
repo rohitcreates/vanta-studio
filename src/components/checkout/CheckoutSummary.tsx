@@ -6,11 +6,13 @@ import OrderItem from "./OrderItem";
 interface CheckoutSummaryProps {
   checkoutItems: CartItem[];
   onPlaceOrder: () => void;
+  loading: boolean;
 }
 
 export default function CheckoutSummary({
   checkoutItems,
   onPlaceOrder,
+  loading,
 }: CheckoutSummaryProps) {
 
   const subtotal = checkoutItems.reduce((total, item) => {
@@ -64,9 +66,10 @@ export default function CheckoutSummary({
 
         <button
           onClick={onPlaceOrder}
-          className="mt-6 w-full rounded-lg bg-white py-3 text-black transition hover:bg-gray-200"
+          disabled={loading}
+          className="mt-6 w-full rounded-lg bg-white py-3 text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Place Order
+          {loading ? "Placing Order..." : "Place Order"}
         </button>
       </div>
     </div>
