@@ -1,4 +1,4 @@
-import type { Product } from "@/types/product";
+import { prisma } from "@/lib/prisma";
 import ProductGallery from "@/components/product/productGallery";
 import ProductDetails from "@/components/product/productDetails";
 import ProductDescription from "@/components/product/productDescription";
@@ -14,25 +14,31 @@ export default async function ProductPage({
 }: ProductPageProps) {
   const { id } = await params;
 
-  const response = await fetch(
-    `http://localhost:3000/api/products/${id}`
-  );
-
-  const product = await response.json();
+  const product = await prisma.product.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
 
   if (!product) {
     return <h1>Product not found.</h1>;
   }
 
+  const formattedProduct = {
+    ...product,
+    sizes: product.sizes.split(","),
+    colors: product.colors.split(","),
+  };
+
   return (
     <main className="container mx-auto px-4 py-10">
       <div className="grid gap-10 lg:grid-cols-2">
-        <ProductGallery product={product} />
-        <ProductDetails product={product} />
+        <ProductGallery product={formattedProduct} />
+        <ProductDetails product={formattedProduct} />
       </div>
 
       <div className="mt-16">
-        <ProductDescription product={product} />
+        <ProductDescription product={formattedProduct} />
       </div>
     </main>
   );

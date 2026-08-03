@@ -1,10 +1,14 @@
 import ProductGrid from "@/components/ProductGrid";
-import type { Product } from "@/types/product";
+import { prisma } from "@/lib/prisma";
 
 export default async function AllProductsPage() {
-  const response = await fetch("http://localhost:3000/api/products");
+  const products = await prisma.product.findMany();
 
-  const products: Product[] = await response.json();
+  const formattedProducts = products.map((product) => ({
+    ...product,
+    sizes: product.sizes.split(","),
+    colors: product.colors.split(","),
+  }));
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
@@ -12,7 +16,7 @@ export default async function AllProductsPage() {
         All Products
       </h1>
 
-      <ProductGrid products={products} />
+      <ProductGrid products={formattedProducts} />
     </main>
   );
 }

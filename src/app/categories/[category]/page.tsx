@@ -1,5 +1,5 @@
 import ProductGrid from "@/components/ProductGrid";
-import type { Product } from "@/types/product";
+import { prisma } from "@/lib/prisma";
 
 type CategoryPageProps = {
   params: Promise<{
@@ -12,12 +12,17 @@ export default async function CategoryPage({
 }: CategoryPageProps) {
   const { category } = await params;
 
-  const response = await fetch(`http://localhost:3000/api/products?category=${category}`);
+  const products = await prisma.product.findMany({
+    where: {
+      category,
+    },
+  });
 
-  const products: Product[] = await response.json();
-
-  
-  
+  const formattedProducts = products.map((product) => ({
+    ...product,
+    sizes: product.sizes.split(","),
+    colors: product.colors.split(","),
+  }));
 
   return (
     <main>
@@ -25,7 +30,7 @@ export default async function CategoryPage({
         {category}
       </h1>
 
-      <ProductGrid products={products} />
+      <ProductGrid products={formattedProducts} />
     </main>
   );
 }

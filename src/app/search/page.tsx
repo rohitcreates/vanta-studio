@@ -1,5 +1,5 @@
 import ProductGrid from "@/components/ProductGrid";
-import type { Product } from "@/types/product";
+import { prisma } from "@/lib/prisma";
 
 type SearchPageProps = {
   searchParams: Promise<{
@@ -12,13 +12,17 @@ export default async function SearchPage({
 }: SearchPageProps) {
   const { q = "" } = await searchParams;
 
-  const response = await fetch("http://localhost:3000/api/products");
+  const products = await prisma.product.findMany();
 
-  const products: Product[] = await response.json();
+  const formattedProducts = products.map((product) => ({
+    ...product,
+    sizes: product.sizes.split(","),
+    colors: product.colors.split(","),
+  }));
 
   const search = q.toLowerCase();
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = formattedProducts.filter((product) => {
     return (
       product.name.toLowerCase().includes(search) ||
       product.brand.toLowerCase().includes(search) ||
