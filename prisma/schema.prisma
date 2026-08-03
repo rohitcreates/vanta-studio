@@ -1,34 +1,85 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   category    String
   brand       String
   price       Float
   image       String
   description String
-  rating      Float     @default(0)
-  reviews     Int       @default(0)
+  rating      Float       @default(0)
+  reviews     Int         @default(0)
   sizes       String
   colors      String
-  trending    Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  trending    Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   cartItems   CartItem[]
-  orderItems OrderItem[]
+  orderItems  OrderItem[]
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String
+  username  String     @unique
+  email     String     @unique
+  password  String
+  role      Role       @default(CUSTOMER)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  cartItems CartItem[]
+  orders    Order[]
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int      @default(1)
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  total         Float
+  status        OrderStatus @default(PENDING)
+  paymentMethod String
+  firstName     String
+  lastName      String
+  email         String
+  phone         String
+  address       String
+  city          String
+  state         String
+  postalCode    String
+  createdAt     DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  size      String
+  color     String
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 enum Role {
@@ -42,79 +93,4 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  username  String   @unique
-  email     String   @unique
-  password  String
-  role      Role     @default(CUSTOMER)
-
-  cartItems CartItem[]
-   orders    Order[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model CartItem {
-  id Int @id @default(autoincrement())
-
-  quantity Int @default(1)
-
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  productId Int
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@unique([userId, productId])
-}
-
-model Order {
-  id Int @id @default(autoincrement())
-
-  userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  total Float
-
-  status OrderStatus @default(PENDING)
-
-  paymentMethod String
-
-  firstName String
-  lastName String
-  email String
-  phone String
-
-  address String
-  city String
-  state String
-  postalCode String
-
-  items OrderItem[]
-
-  createdAt DateTime @default(now())
-}
-
-model OrderItem {
-  id Int @id @default(autoincrement())
-
-  orderId Int
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  productId Int
-  product Product @relation(fields: [productId], references: [id])
-
-  quantity Int
-
-  size String
-  color String
-
-  price Float
 }
