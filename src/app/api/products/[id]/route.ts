@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { ProductSchema } from "@/lib/validations/product";
 import { ZodError } from "zod";
-import { Prisma } from "@/generated/prisma/client";
+import { Prisma } from "@prisma/client";
 
 type RouteParams = {
   params: Promise<{
