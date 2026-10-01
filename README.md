@@ -8,23 +8,7 @@ It includes a complete shopping flow with authentication, product browsing, sear
 
 **Live:** https://vanta-studio-delta.vercel.app
 
-## 📸 Screenshots
 
-### Home Page
-
-![Home](./screenshots/home.png)
-
-### Product Page
-
-![Product](./screenshots/product.png)
-
-### Cart
-
-![Cart](./screenshots/cart.png)
-
-### Admin Dashboard
-
-![Admin Dashboard](./screenshots/admin.png)
 
 ## ✨ Features
 
