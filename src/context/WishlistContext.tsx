@@ -32,14 +32,11 @@ export function WishlistProvider({
       const savedWishlist = localStorage.getItem("wishlist");
 
       if (savedWishlist) {
-        // Browser storage is read after mount to avoid server/client hydration mismatches.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setWishlist(JSON.parse(savedWishlist));
       }
     } catch (error) {
       console.error("Failed to load wishlist:", error);
     } finally {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasHydrated(true);
     }
   }, []);
@@ -55,7 +52,7 @@ export function WishlistProvider({
     } catch (error) {
       console.error("Failed to save wishlist:", error);
     }
-  }, [wishlist]);
+  }, [wishlist, hasHydrated]);
 
   const toggleWishlist = (id: number) => {
     setWishlist((prevWishlist) => {
