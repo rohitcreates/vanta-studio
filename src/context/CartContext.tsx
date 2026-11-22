@@ -49,22 +49,28 @@ export function CartProvider({
   children: ReactNode;
 }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [hasHydrated, setHasHydrated] = useState(false);
 
-  
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem("cart");
 
       if (savedCart) {
+        // Browser storage is read after mount to avoid server/client hydration mismatches.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCart(JSON.parse(savedCart));
       }
     } catch (error) {
       console.error("Failed to load cart:", error);
+    } finally {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHasHydrated(true);
     }
   }, []);
 
- 
   useEffect(() => {
+    if (!hasHydrated) return;
+
     try {
       localStorage.setItem("cart", JSON.stringify(cart));
     } catch (error) {
