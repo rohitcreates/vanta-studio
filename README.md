@@ -93,7 +93,7 @@ Never commit `.env` or real credentials.
 
 ```bash
 npx prisma generate
-npx prisma migrate dev
+npx prisma db push
 ```
 
 ### 4. Seed development products
@@ -127,7 +127,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - Authentication uses NextAuth credentials with JWT-backed sessions. The session cookie is managed by NextAuth; client-side state is not an authorization boundary.
 - Protected API routes resolve the current user on the server. Product mutations require the current database role to be `ADMIN`.
 - Order creation derives the owner from the authenticated session. The API does not accept a client-supplied user ID.
-- This project still needs automated tests for authentication, authorization, checkout, and order ownership, plus a full deployment configuration review.
+- CI currently syncs the Prisma schema to a disposable PostgreSQL database with `prisma db push`; the existing migration history still needs a PostgreSQL baseline before using `prisma migrate deploy` for production database changes.
 - Do not use real payment credentials or production customer data.
 
 ## Engineering work in progress
