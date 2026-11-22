@@ -23,6 +23,8 @@ export default function ProfilePage() {
         return;
       }
 
+      setLoading(true);
+
       try {
         const response = await fetch("/api/orders");
         const data = await response.json();
