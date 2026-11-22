@@ -60,20 +60,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!storageKey) return;
 
+    let nextCart: CartItem[] = [];
+
     try {
       const savedCart = localStorage.getItem(storageKey);
 
-      if (!savedCart) {
-        setCart([]);
-      } else {
+      if (savedCart) {
         const parsed: unknown = JSON.parse(savedCart);
-        setCart(isCartItemArray(parsed) ? parsed : []);
+        nextCart = isCartItemArray(parsed) ? parsed : [];
       }
     } catch (error) {
       console.error("Failed to load cart:", error);
-      setCart([]);
     }
 
+    // This effect intentionally hydrates React state from localStorage after
+    // the authenticated user's storage key is known. The targeted suppression
+    // avoids disabling the rule for any other state updates in this file.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCart(nextCart);
     setLoadedStorageKey(storageKey);
   }, [storageKey]);
 
