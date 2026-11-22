@@ -9,6 +9,24 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: vanta_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d vanta_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/vanta_ci?schema=public
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ci-only-secret-not-used-for-deployment
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -28,9 +46,8 @@ jobs:
       - name: Type-check
         run: npm run typecheck
 
+      - name: Apply database migrations
+        run: npx prisma migrate deploy
+
       - name: Build
         run: npm run build
-        env:
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/vanta_ci?schema=public
-          NEXTAUTH_URL: http://localhost:3000
-          NEXTAUTH_SECRET: ci-only-secret-not-used-for-deployment
