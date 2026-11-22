@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/context/CheckoutContext";
 import ShippingForm from "@/components/checkout/ShippingForm";
@@ -9,18 +10,12 @@ import PaymentMethod from "@/components/checkout/PaymentMethod";
 import CheckoutSummary from "@/components/checkout/CheckoutSummary";
 
 export default function CheckoutPage() {
-  const {
-    checkoutItems,
-    checkoutSource,
-    clearCheckout,
-  } = useCheckout();
-
+  const { checkoutItems, checkoutSource, clearCheckout } = useCheckout();
   const { clearCart } = useCart();
-
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-
   const [shippingInfo, setShippingInfo] = useState({
     firstName: "",
     lastName: "",
@@ -31,12 +26,20 @@ export default function CheckoutPage() {
     state: "",
     postalCode: "",
   });
-
   const [saveAddress, setSaveAddress] = useState(false);
-
   const [paymentMethod, setPaymentMethod] = useState("cod");
 
   const handlePlaceOrder = async () => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      alert("Please login first.");
+      router.push("/login");
+      return;
+    }
+
     if (
       !shippingInfo.firstName ||
       !shippingInfo.lastName ||
@@ -51,31 +54,15 @@ export default function CheckoutPage() {
       return;
     }
 
-    const savedUser = localStorage.getItem("user");
-
-    if (!savedUser) {
-      alert("Please login first.");
-      router.push("/login");
-      return;
-    }
-
-    const user = JSON.parse(savedUser);
-
     try {
       setLoading(true);
 
       const response = await fetch("/api/orders", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: user.id,
-
           paymentMethod,
-
           ...shippingInfo,
-
           items: checkoutItems.map((item) => ({
             productId: item.id,
             quantity: item.quantity,
@@ -88,7 +75,7 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        throw new Error(data.message ?? "Unable to place order.");
       }
 
       if (saveAddress) {
@@ -103,14 +90,11 @@ export default function CheckoutPage() {
       }
 
       clearCheckout();
-
       router.push("/order-success");
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert("Something went wrong.");
-      }
+      alert(
+        error instanceof Error ? error.message : "Something went wrong."
+      );
     } finally {
       setLoading(false);
     }
@@ -118,9 +102,7 @@ export default function CheckoutPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
-      <h1 className="mb-8 text-3xl font-bold">
-        Checkout
-      </h1>
+      <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
 
       <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
         <div className="space-y-8">
@@ -140,7 +122,7 @@ export default function CheckoutPage() {
         <CheckoutSummary
           checkoutItems={checkoutItems}
           onPlaceOrder={handlePlaceOrder}
-          loading={loading}
+          loading={loading || authLoading}
         />
       </div>
     </main>
