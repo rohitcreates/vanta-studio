@@ -1,9 +1,7 @@
 import { z } from "zod";
 
 export const OrderSchema = z.object({
-  userId: z.number().int().positive(),
-
-  paymentMethod: z.string(),
+  paymentMethod: z.string().min(1),
 
   firstName: z.string().min(2),
   lastName: z.string().min(2),
@@ -17,10 +15,10 @@ export const OrderSchema = z.object({
 
   items: z.array(
     z.object({
-      productId: z.number(),
-      quantity: z.number().min(1),
-      size: z.string(),
-      color: z.string(),
+      productId: z.number().int().positive(),
+      quantity: z.number().int().min(1),
+      size: z.string().min(1),
+      color: z.string().min(1),
     })
-  ),
+  ).min(1),
 });

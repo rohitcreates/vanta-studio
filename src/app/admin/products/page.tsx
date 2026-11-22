@@ -20,21 +20,44 @@ export default function ProductsPage() {
 
   async function fetchProducts() {
     try {
-      setLoading(true);
-
       const response = await fetch("/api/products");
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
 
       setProducts(data);
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchProducts();
+    let cancelled = false;
+
+    async function loadProducts() {
+      try {
+        const response = await fetch("/api/products");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        if (!cancelled) setProducts(data);
+      } catch (error) {
+        if (!cancelled) console.error(error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void loadProducts();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (

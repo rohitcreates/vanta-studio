@@ -35,6 +35,7 @@ export default function ProductModal({
         </div>
 
         <ProductForm
+          key={product?.id ?? "new"}
           product={product}
           onSuccess={onSuccess}
           onClose={onClose}

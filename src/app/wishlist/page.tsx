@@ -19,7 +19,7 @@ export default function WishlistPage() {
         </h1>
 
         <p className="mt-4 text-lg text-zinc-400">
-          You haven't added any products yet.
+          You haven&apos;t added any products yet.
         </p>
       </main>
     );
