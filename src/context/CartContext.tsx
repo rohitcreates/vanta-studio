@@ -56,14 +56,11 @@ export function CartProvider({
       const savedCart = localStorage.getItem("cart");
 
       if (savedCart) {
-        // Browser storage is read after mount to avoid server/client hydration mismatches.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCart(JSON.parse(savedCart));
       }
     } catch (error) {
       console.error("Failed to load cart:", error);
     } finally {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasHydrated(true);
     }
   }, []);
@@ -76,7 +73,7 @@ export function CartProvider({
     } catch (error) {
       console.error("Failed to save cart:", error);
     }
-  }, [cart]);
+  }, [cart, hasHydrated]);
 
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
