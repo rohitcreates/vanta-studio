@@ -23,22 +23,25 @@ interface WishlistProviderProps {
 export function WishlistProvider({
   children,
 }: WishlistProviderProps) {
-
   const [wishlist, setWishlist] = useState<number[]>([]);
   const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const savedWishlist = localStorage.getItem("wishlist");
+    const timeoutId = window.setTimeout(() => {
+      try {
+        const savedWishlist = localStorage.getItem("wishlist");
 
-      if (savedWishlist) {
-        setWishlist(JSON.parse(savedWishlist));
+        if (savedWishlist) {
+          setWishlist(JSON.parse(savedWishlist));
+        }
+      } catch (error) {
+        console.error("Failed to load wishlist:", error);
+      } finally {
+        setHasHydrated(true);
       }
-    } catch (error) {
-      console.error("Failed to load wishlist:", error);
-    } finally {
-      setHasHydrated(true);
-    }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
