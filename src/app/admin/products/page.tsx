@@ -20,8 +20,6 @@ export default function ProductsPage() {
 
   async function fetchProducts() {
     try {
-      setLoading(true);
-
       const response = await fetch("/api/products");
       const data = await response.json();
 
