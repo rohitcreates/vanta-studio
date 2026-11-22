@@ -1,35 +1,45 @@
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/server-auth";
 import { OrderSchema } from "@/lib/validations/order";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
 export async function POST(request: Request) {
   try {
-    const body = OrderSchema.parse(await request.json());
+    const user = await getCurrentUser();
 
-    let total = 0;
+    if (!user) {
+      return NextResponse.json(
+        { message: "Authentication required." },
+        { status: 401 }
+      );
+    }
+
+    const body = OrderSchema.parse(await request.json());
+    const productIds = [...new Set(body.items.map((item) => item.productId))];
 
     const products = await prisma.product.findMany({
-      where: {
-        id: {
-          in: body.items.map((item) => item.productId),
-        },
-      },
+      where: { id: { in: productIds } },
     });
 
-    const orderItems = body.items.map((item) => {
-      const product = products.find(
-        (p) => p.id === item.productId
+    if (products.length !== productIds.length) {
+      return NextResponse.json(
+        { message: "One or more products could not be found." },
+        { status: 400 }
       );
+    }
+
+    const productById = new Map(products.map((product) => [product.id, product]));
+
+    const orderItems = body.items.map((item) => {
+      const product = productById.get(item.productId);
 
       if (!product) {
         throw new Error("Product not found.");
       }
 
-      total += product.price * item.quantity;
-
       return {
-        productId: item.productId,
+        productId: product.id,
         quantity: item.quantity,
         size: item.size,
         color: item.color,
@@ -37,109 +47,75 @@ export async function POST(request: Request) {
       };
     });
 
+    const total = orderItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
     const order = await prisma.order.create({
       data: {
-        userId: body.userId,
-
+        userId: user.id,
         paymentMethod: body.paymentMethod,
-
         firstName: body.firstName,
         lastName: body.lastName,
         email: body.email,
         phone: body.phone,
-
         address: body.address,
         city: body.city,
         state: body.state,
         postalCode: body.postalCode,
-
         total,
-
-        items: {
-          create: orderItems,
-        },
+        items: { create: orderItems },
       },
-
-      include: {
-        items: true,
-      },
+      include: { items: true },
     });
 
-    return NextResponse.json(order, {
-      status: 201,
-    });
+    return NextResponse.json(order, { status: 201 });
   } catch (error) {
     if (error instanceof ZodError) {
       return NextResponse.json(
-        {
-          message: "Invalid order data.",
-          errors: error.issues,
-        },
-        {
-          status: 400,
-        }
+        { message: "Invalid order data.", errors: error.issues },
+        { status: 400 }
       );
     }
 
-    console.error(error);
+    console.error("Order creation failed:", error);
 
     return NextResponse.json(
-      {
-        message: "Internal server error.",
-      },
-      {
-        status: 500,
-      }
+      { message: "Unable to create order." },
+      { status: 500 }
     );
   }
 }
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
+    const user = await getCurrentUser();
 
-    const userId = Number(searchParams.get("userId"));
-
-    if (!userId) {
+    if (!user) {
       return NextResponse.json(
-        {
-          message: "User ID is required.",
-        },
-        {
-          status: 400,
-        }
+        { message: "Authentication required." },
+        { status: 401 }
       );
     }
 
     const orders = await prisma.order.findMany({
-      where: {
-        userId,
-      },
-
+      where: { userId: user.id },
       include: {
         items: {
-          include: {
-            product: true,
-          },
+          include: { product: true },
         },
       },
-
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(orders);
   } catch (error) {
-    console.error(error);
+    console.error("Order lookup failed:", error);
 
     return NextResponse.json(
-      {
-        message: "Internal server error.",
-      },
-      {
-        status: 500,
-      }
+      { message: "Unable to load orders." },
+      { status: 500 }
     );
   }
 }
