@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Product } from "@/types/product";
 
 type ProductFormProps = {
@@ -28,29 +28,25 @@ export default function ProductForm({
   onSuccess,
   onClose,
 }: ProductFormProps) {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(() =>
+    product
+      ? {
+          name: product.name,
+          category: product.category,
+          brand: product.brand,
+          price: product.price,
+          image: product.image,
+          description: product.description,
+          rating: product.rating,
+          reviews: product.reviews,
+          sizes: product.sizes.join(", "),
+          colors: product.colors.join(", "),
+          trending: product.trending,
+        }
+      : initialForm
+  );
 
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (product) {
-      setForm({
-        name: product.name,
-        category: product.category,
-        brand: product.brand,
-        price: product.price,
-        image: product.image,
-        description: product.description,
-        rating: product.rating,
-        reviews: product.reviews,
-        sizes: product.sizes.join(", "),
-        colors: product.colors.join(", "),
-        trending: product.trending,
-      });
-    } else {
-      setForm(initialForm);
-    }
-  }, [product]);
 
   function handleChange(
     e: React.ChangeEvent<
