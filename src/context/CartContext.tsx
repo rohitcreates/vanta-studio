@@ -52,17 +52,21 @@ export function CartProvider({
   const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem("cart");
+    const timeoutId = window.setTimeout(() => {
+      try {
+        const savedCart = localStorage.getItem("cart");
 
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
+        if (savedCart) {
+          setCart(JSON.parse(savedCart));
+        }
+      } catch (error) {
+        console.error("Failed to load cart:", error);
+      } finally {
+        setHasHydrated(true);
       }
-    } catch (error) {
-      console.error("Failed to load cart:", error);
-    } finally {
-      setHasHydrated(true);
-    }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
