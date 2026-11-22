@@ -4,7 +4,7 @@ A full-stack e-commerce application built with **Next.js 16, React 19, TypeScrip
 
 Vanta Studio explores the core workflows of an online storefront: product discovery, customer accounts, cart and wishlist management, checkout, order history, and an admin interface.
 
-> **Project status:** Portfolio project under active improvement. Authentication and authorization are not yet production-ready. Do not use this application to process real customer data or payments.
+> **Project status:** Portfolio project under active improvement. Authentication and authorization are being hardened. Do not use this application to process real customer data or payments.
 
 ## Live Demo
 
@@ -13,22 +13,20 @@ Vanta Studio explores the core workflows of an online storefront: product discov
 ## Features
 
 ### Storefront
-- Browse the product catalogue
-- View product details
+- Browse the product catalogue and view product details
 - Search and browse products by category
-- Manage a shopping cart
-- Save wishlist items
+- Manage a shopping cart and wishlist
 - Complete the application's checkout flow
-- View order history and order details
+- View personal order history
 
-### Account and administration
+### Accounts and administration
 - Register and sign in with email and password
 - Password hashing with bcrypt
-- Customer profile and account state
-- Admin dashboard interface
-- Product and order management interfaces
+- Server-managed sessions using NextAuth credentials authentication
+- Server-side authorization for product mutations
+- Admin dashboard and product management interface
 
-Some account and admin restrictions currently rely on client-side state. These are being replaced with server-enforced authentication and authorization before the application can be considered production-ready.
+The application is a portfolio project, not a production commerce platform. Payment processing, inventory management, operational monitoring, and comprehensive automated security testing are not implemented.
 
 ## Technology
 
@@ -39,6 +37,7 @@ Some account and admin restrictions currently rely on client-side state. These a
 | Styling | Tailwind CSS |
 | Database | PostgreSQL |
 | ORM | Prisma |
+| Authentication | NextAuth v4 Credentials Provider |
 | Validation | Zod |
 | Password hashing | bcrypt |
 | Icons | Lucide React |
@@ -51,7 +50,7 @@ src/
 ├── components/      # Reusable UI components
 ├── context/         # Client-side application state
 ├── data/            # Product seed data
-├── lib/             # Shared utilities and Prisma client
+├── lib/             # Authentication, utilities, and Prisma client
 ├── providers/       # Application providers
 └── types/           # Shared TypeScript types
 
@@ -64,41 +63,40 @@ prisma/
 ## Getting started
 
 ### Prerequisites
-- Node.js (use a current LTS release)
+- Node.js (current LTS release)
 - npm
 - PostgreSQL
 
-### 1. Clone the repository
+### 1. Clone and install
 
 ```bash
 git clone https://github.com/rohitcreates/vanta-studio.git
 cd vanta-studio
-```
-
-### 2. Install dependencies
-
-```bash
 npm install
 ```
 
-### 3. Configure environment variables
+### 2. Configure environment variables
 
-Create a `.env` file in the project root:
+Copy `.env.example` to `.env` and replace the database placeholder with your PostgreSQL connection string.
 
-```env
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
+Generate a strong NextAuth secret:
+
+```bash
+openssl rand -base64 32
 ```
 
-Replace the placeholders with credentials for your PostgreSQL database. Never commit real credentials.
+Set the generated value as `NEXTAUTH_SECRET`. For local development, set `NEXTAUTH_URL=http://localhost:3000`. In deployment, set `NEXTAUTH_URL` to the canonical application URL and configure a unique secret in the hosting provider's environment settings.
 
-### 4. Generate Prisma Client and apply migrations
+Never commit `.env` or real credentials.
+
+### 3. Prepare the database
 
 ```bash
 npx prisma generate
 npx prisma migrate dev
 ```
 
-### 5. Seed development products
+### 4. Seed development products
 
 ```bash
 npm run seed
@@ -106,7 +104,7 @@ npm run seed
 
 **Warning:** The current seed script deletes existing products before inserting the sample catalogue. Run it only against a disposable development database.
 
-### 6. Start the development server
+### 5. Start the development server
 
 ```bash
 npm run dev
@@ -124,17 +122,20 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run lint` | Run ESLint |
 | `npm run seed` | Replace product data with development seed data |
 
+## Security notes and limitations
+
+- Authentication uses NextAuth credentials with JWT-backed sessions. The session cookie is managed by NextAuth; client-side state is not an authorization boundary.
+- Protected API routes resolve the current user on the server. Product mutations require the current database role to be `ADMIN`.
+- Order creation derives the owner from the authenticated session. The API does not accept a client-supplied user ID.
+- This project still needs automated tests for authentication, authorization, checkout, and order ownership, plus a full deployment configuration review.
+- Do not use real payment credentials or production customer data.
+
 ## Engineering work in progress
 
-The next engineering milestones are:
-
-- Implement server-verified sessions and server-side role checks
-- Enforce ownership checks on customer and order APIs
-- Restrict product and order mutations to authorized administrators
-- Validate and normalize all API inputs
-- Add automated tests for authentication, authorization, checkout, and order access
-- Add CI checks for linting, type checking, and production builds
-- Improve error handling and operational logging
+- Automated tests for authentication, authorization, checkout, and order access
+- CI checks for linting, type checking, and production builds
+- Production deployment verification and environment configuration
+- Better error handling, rate limiting, and operational logging
 
 ## Author
 
