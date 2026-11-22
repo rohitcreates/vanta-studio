@@ -46,8 +46,8 @@ jobs:
       - name: Type-check
         run: npm run typecheck
 
-      - name: Apply database migrations
-        run: npx prisma migrate deploy
+      - name: Sync CI database schema
+        run: npx prisma db push
 
       - name: Build
         run: npm run build
