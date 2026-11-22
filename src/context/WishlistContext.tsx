@@ -25,22 +25,28 @@ export function WishlistProvider({
 }: WishlistProviderProps) {
 
   const [wishlist, setWishlist] = useState<number[]>([]);
-
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const savedWishlist = localStorage.getItem("wishlist");
 
       if (savedWishlist) {
+        // Browser storage is read after mount to avoid server/client hydration mismatches.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setWishlist(JSON.parse(savedWishlist));
       }
     } catch (error) {
       console.error("Failed to load wishlist:", error);
+    } finally {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHasHydrated(true);
     }
   }, []);
 
- 
   useEffect(() => {
+    if (!hasHydrated) return;
+
     try {
       localStorage.setItem(
         "wishlist",
